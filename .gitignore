@@ -1,0 +1,22 @@
+# Ignore sensitive and generated files
+ansible/group_vars/all.yml
+*.retry
+*.log
+*.bak
+*.swp
+__pycache__/
+*.pyc
+scripts/*.log
+scripts/*.bak
+*.smbcredentials
+*.gpg
+*.key
+*.tar.gz
+*.zip
+docker/dashy-data/
+docker/netdata-data/
+
+# Ignore GitHub Actions workflow artifacts and local test output
+.github/workflows/
+tests/
+coverage/

@@ -1,0 +1,20 @@
+---
+- name: Full Nextcloud Production Setup on Le Potato
+  hosts: lepotato
+  become: true
+  vars_files:
+    - group_vars/all.yml
+  roles:
+    - role: common
+    - role: smb
+    - role: ufw
+    - role: fail2ban
+    - role: nginx
+    - role: php
+    - role: nextcloud
+    - role: borgbackup
+    - role: notifications
+    - role: cockpit
+    - role: dashy
+    - role: netdata
+    - role: disaster_recovery
