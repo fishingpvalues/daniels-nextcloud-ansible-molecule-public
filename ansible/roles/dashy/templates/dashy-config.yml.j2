@@ -1,0 +1,36 @@
+appConfig:
+  title: Nextcloud Home
+  description: Dashy dashboard for Le Potato Nextcloud
+  theme: colorful
+  layout: auto
+  icon: https://nextcloud.com/wp-content/themes/nextcloud.com/images/favicon/favicon.ico
+  navLinks:
+    - title: Nextcloud
+      url: http://{{ nextcloud_domain }}
+      icon: https://nextcloud.com/wp-content/themes/nextcloud.com/images/favicon/favicon.ico
+    - title: Cockpit
+      url: https://lepotato:9090
+      icon: https://avatars.githubusercontent.com/u/25466506?s=200&v=4
+    - title: Netdata
+      url: http://lepotato:19999
+      icon: https://www.netdata.cloud/favicon.ico
+    - title: Fritz!Box
+      url: http://{{ fritzbox_ip }}
+      icon: https://avm.de/fileadmin/images/favicon.ico
+    - title: Fritz!NAS
+      url: http://{{ fritzbox_ip }}
+      icon: https://avm.de/fileadmin/images/favicon.ico
+    - title: Backup Logs
+      url: file:///mnt/fritz-nas/backups
+      icon: mdi:archive
+sections:
+  - name: System
+    items:
+      - title: Nextcloud Status
+        description: Check Nextcloud health
+        url: http://{{ nextcloud_domain }}/status.php
+        icon: mdi:cloud-check
+      - title: Restore Nextcloud
+        description: Run restore script via Cockpit
+        url: https://lepotato:9090
+        icon: mdi:backup-restore

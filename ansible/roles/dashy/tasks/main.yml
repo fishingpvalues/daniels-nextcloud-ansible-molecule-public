@@ -1,0 +1,36 @@
+---
+- name: Ensure Docker is installed
+  ansible.builtin.apt:
+    name:
+      - docker.io
+      - docker-compose
+    state: present
+    update_cache: true
+
+- name: Add user daniel to docker group
+  ansible.builtin.user:
+    name: daniel
+    groups: docker
+    append: true
+
+- name: Deploy Dashy config
+  ansible.builtin.template:
+    src: dashy-config.yml.j2
+    dest: /opt/dashy-config.yml
+    owner: daniel
+    group: daniel
+    mode: '0644'
+
+- name: Deploy Docker Compose file
+  ansible.builtin.copy:
+    src: ../../../docker/docker-compose.yml
+    dest: /opt/docker-compose.yml
+    owner: daniel
+    group: daniel
+    mode: '0644'
+
+- name: Start Dashy and Netdata containers
+  ansible.builtin.command: docker-compose -f /opt/docker-compose.yml up -d
+  args:
+    chdir: /opt
+  changed_when: false

@@ -1,0 +1,39 @@
+---
+- name: Copy disaster recovery script
+  ansible.builtin.copy:
+    src: ../../../scripts/disaster-recovery.sh
+    dest: /usr/local/bin/disaster-recovery.sh
+    owner: root
+    group: root
+    mode: '0750'
+
+- name: Ensure disaster recovery config
+  ansible.builtin.lineinfile:
+    path: /etc/disaster-recovery.conf
+    regexp: '^ENABLED='
+    line: 'ENABLED=true'
+
+- name: Print disaster recovery status
+  ansible.builtin.debug:
+    msg: "Disaster recovery is enabled."
+
+- name: Ensure restore script is present
+  ansible.builtin.copy:
+    src: ../../../scripts/nextcloud-restore.sh
+    dest: /usr/local/bin/nextcloud-restore.sh
+    owner: root
+    group: root
+    mode: '0750'
+
+- name: Allow daniel to run restore script without password
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers.d/nextcloud-restore
+    create: true
+    line: 'daniel ALL=(root) NOPASSWD: /usr/local/bin/nextcloud-restore.sh'
+    owner: root
+    group: root
+    mode: '0440'
+
+- name: Add Cockpit integration note
+  ansible.builtin.debug:
+    msg: "Restore script available for Cockpit integration. Run via Cockpit terminal or SSH: sudo /usr/local/bin/nextcloud-restore.sh"

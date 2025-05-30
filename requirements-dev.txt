@@ -1,0 +1,8 @@
+ansible-lint
+yamllint
+pytest
+flake8
+ruff
+molecule
+docker
+# shellcheck, hadolint, and act are not Python tools; see README for install instructions 

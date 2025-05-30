@@ -1,0 +1,44 @@
+---
+- name: Ensure Nextcloud data directory exists
+  ansible.builtin.file:
+    path: "{{ nextcloud_data_dir }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0750'
+
+- name: Download latest Nextcloud
+  ansible.builtin.get_url:
+    url: https://download.nextcloud.com/server/releases/latest.tar.bz2
+    dest: /tmp/nextcloud-latest.tar.bz2
+    mode: '0644'
+
+- name: Extract Nextcloud
+  ansible.builtin.unarchive:
+    src: /tmp/nextcloud-latest.tar.bz2
+    dest: /var/www/
+    remote_src: true
+    creates: /var/www/nextcloud
+
+- name: Set permissions for Nextcloud
+  ansible.builtin.file:
+    path: /var/www/nextcloud
+    owner: www-data
+    group: www-data
+    recurse: true
+
+- name: Ensure Nextcloud cron job for www-data
+  ansible.builtin.cron:
+    name: "Nextcloud background jobs"
+    user: www-data
+    minute: "*/5"
+    job: "php -f /var/www/nextcloud/cron.php"
+
+- name: Ensure Nextcloud config.php is writable
+  ansible.builtin.file:
+    path: /var/www/nextcloud/config/config.php
+    owner: www-data
+    group: www-data
+    mode: '0640'
+    state: touch
+  failed_when: false

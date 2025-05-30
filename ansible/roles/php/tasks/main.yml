@@ -1,0 +1,38 @@
+---
+- name: Install PHP 8.2 and required extensions
+  ansible.builtin.apt:
+    name:
+      - php8.2-fpm
+      - php8.2-cli
+      - php8.2-mbstring
+      - php8.2-xml
+      - php8.2-gd
+      - php8.2-curl
+      - php8.2-zip
+      - php8.2-mysql
+      - php8.2-bcmath
+      - php8.2-gmp
+      - php8.2-intl
+      - php8.2-imagick
+      - php-apcu
+      - php8.2-sqlite3
+    state: present
+    update_cache: true
+
+- name: Ensure PHP-FPM is enabled and started
+  ansible.builtin.systemd:
+    name: php8.2-fpm
+    enabled: true
+    state: started
+
+- name: Tune PHP for Nextcloud
+  ansible.builtin.lineinfile:
+    path: /etc/php/8.2/fpm/php.ini
+    regexp: '^{{ item.key }}'
+    line: '{{ item.key }} = {{ item.value }}'
+  loop:
+    - { key: 'memory_limit', value: '512M' }
+    - { key: 'upload_max_filesize', value: '1G' }
+    - { key: 'post_max_size', value: '1G' }
+    - { key: 'output_buffering', value: 'Off' }
+  notify: Restart php8.2-fpm

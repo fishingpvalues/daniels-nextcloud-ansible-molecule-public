@@ -1,0 +1,7 @@
+---
+- name: Ensure Netdata is running via Docker Compose
+  ansible.builtin.command: docker-compose -f /opt/docker-compose.yml up -d netdata
+  args:
+    chdir: /opt
+  register: netdata_up
+  changed_when: false

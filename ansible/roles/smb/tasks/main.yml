@@ -1,0 +1,30 @@
+---
+- name: Install cifs-utils for SMB mounting
+  ansible.builtin.apt:
+    name: cifs-utils
+    state: present
+    update_cache: true
+
+- name: Create NAS mount directory
+  ansible.builtin.file:
+    path: "{{ nas_mount }}"
+    state: directory
+    owner: daniel
+    group: daniel
+    mode: '0755'
+
+- name: Deploy SMB credentials file
+  ansible.builtin.template:
+    src: smb-credentials.j2
+    dest: /etc/smb-credentials
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Ensure NAS is mounted in fstab
+  ansible.posix.mount:
+    path: "{{ nas_mount }}"
+    src: "{{ nas_share }}"
+    fstype: cifs
+    opts: "credentials=/etc/smb-credentials,iocharset=utf8,vers=1.0"
+    state: mounted

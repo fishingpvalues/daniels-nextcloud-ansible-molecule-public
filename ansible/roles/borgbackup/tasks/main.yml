@@ -1,0 +1,67 @@
+---
+- name: Install BorgBackup and GPG
+  ansible.builtin.apt:
+    name:
+      - borgbackup
+      - gnupg
+    state: present
+    update_cache: true
+
+- name: Ensure backup directory exists
+  ansible.builtin.file:
+    path: "{{ nas_mount }}/backups"
+    state: directory
+    owner: daniel
+    group: daniel
+    mode: '0750'
+
+- name: Copy backup script
+  ansible.builtin.copy:
+    src: ../../../scripts/nextcloud-backup.sh
+    dest: /usr/local/bin/nextcloud-backup.sh
+    owner: root
+    group: root
+    mode: '0750'
+
+- name: Copy restore script
+  ansible.builtin.copy:
+    src: ../../../scripts/nextcloud-restore.sh
+    dest: /usr/local/bin/nextcloud-restore.sh
+    owner: root
+    group: root
+    mode: '0750'
+
+- name: Ensure systemd service for backup
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/nextcloud-backup.service
+    content: |
+      [Unit]
+      Description=Encrypted Nextcloud Backup
+      After=network-online.target
+      Wants=network-online.target
+
+      [Service]
+      ExecStart=/usr/local/bin/nextcloud-backup.sh
+      Nice=10
+      ProtectSystem=full
+      PrivateTmp=true
+
+      [Install]
+      WantedBy=multi-user.target
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Enable and start backup service
+  ansible.builtin.systemd:
+    name: nextcloud-backup.service
+    enabled: true
+    state: started
+
+- name: Ensure daily cron for backup
+  ansible.builtin.cron:
+    name: "Nextcloud daily backup"
+    user: root
+    minute: 0
+    hour: 2
+    job: "/usr/local/bin/nextcloud-backup.sh"

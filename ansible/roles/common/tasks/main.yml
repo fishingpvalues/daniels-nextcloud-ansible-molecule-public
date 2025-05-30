@@ -1,0 +1,34 @@
+---
+- name: Ensure basic packages are installed
+  ansible.builtin.apt:
+    name:
+      - sudo
+      - curl
+      - gnupg
+      - apt-transport-https
+      - ca-certificates
+      - software-properties-common
+      - python3-pip
+      - python3-apt
+      - unzip
+      - zip
+      - git
+      - lsb-release
+      - cron
+    state: present
+    update_cache: true
+
+- name: Ensure user daniel exists
+  ansible.builtin.user:
+    name: daniel
+    password: "{{ 'nicepassword' | password_hash('sha512') }}"
+    shell: /bin/bash
+    groups: sudo
+    append: true
+
+- name: Set authorized key for daniel (optional, for SSH key auth)
+  community.general.authorized_key:
+    user: daniel
+    state: present
+    key: "{{ lookup('file', '~/.ssh/id_rsa.pub') | default('', true) }}"
+  ignore_errors: true

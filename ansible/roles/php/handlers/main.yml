@@ -1,0 +1,5 @@
+---
+- name: Restart php8.2-fpm
+  ansible.builtin.systemd:
+    name: php8.2-fpm
+    state: restarted
