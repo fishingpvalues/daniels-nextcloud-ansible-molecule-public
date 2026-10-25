@@ -12,7 +12,7 @@
 - Insert the SD card and power on your Le Potato.
 - On first boot:
   - Set the **root password** when prompted.
-  - Create a **normal user** (e.g., `daniel`) and set the password (`xxx`).
+  - Create a **normal user** (e.g., `daniel`) and set a password (`<set-me>`).
   - Confirm language and locale settings.
   - (Optional) Use `armbian-config` to transfer the OS to internal media (eMMC/SATA/USB) if desired.
 
@@ -64,8 +64,8 @@
 - On your control machine (PC/laptop):
 
   ```sh
-  git clone https://github.com/fishingpvalues/daniels-nextcloud.git
-  cd daniels-nextcloud
+  git clone https://github.com/fishingpvalues/daniels-nextcloud-ansible-molecule-public.git
+  cd daniels-nextcloud-ansible-molecule-public
   ```
 
 - Edit `ansible/inventory` if your Le Potato IP is different.
@@ -122,13 +122,14 @@
 1. **Clone this repo:**
 
    ```sh
-   git clone https://github.com/fishingpvalues/daniels-nextcloud.git
-   cd daniels-nextcloud
+   git clone https://github.com/fishingpvalues/daniels-nextcloud-ansible-molecule-public.git
+   cd daniels-nextcloud-ansible-molecule-public
    ```
 
 2. **Edit Ansible inventory if needed:**
-   - Default user: `daniel`, password: `nicepassword`, Le Potato IP: `192.168.178.40`
-   - Edit `ansible/inventory` if your IP differs.
+   - Default user: `daniel`, Le Potato IP: `192.168.178.40`
+   - `ansible/inventory` and the SMB credentials templates contain the literal placeholder `nicepassword`. Replace every occurrence with a value you keep out of git: `ansible_ssh_pass=<set-me>`, `ansible_become_pass=<set-me>`, `password=<set-me>`.
+   - Keep real secrets in an `ansible-vault` file (`ansible-vault create ansible/vault.yml`) and reference them as variables, or use SSH keys instead of `ansible_ssh_pass`. Run the playbook with `--ask-vault-pass`.
 3. **Run the playbook:**
 
    ```sh
@@ -150,36 +151,20 @@
 ## Security
 
 - UFW/Fail2Ban only allow local subnet (192.168.178.0/24)
-- All credentials are stored securely and not world-readable.
 
 ## Customization
 
-- All variables in `ansible/group_vars/all.yml`.
+- Variables are set in the role tasks and `ansible/playbook.yml`.
 - Add more roles or monitoring as needed.
 
-## Support
+## Local testing
 
-- For issues, open a GitHub issue or contact the maintainer.
-
-## Local Testing & CI
-
-This project uses GitHub Actions for CI, but you can run all checks locally using [act](https://github.com/nektos/act).
-
-### Install requirements
-
-- Python tools: `pip install -r requirements-dev.txt`
-- [ShellCheck](https://www.shellcheck.net/): install via your package manager (e.g., `sudo apt install shellcheck`)
-- [Hadolint](https://github.com/hadolint/hadolint): install via your package manager (e.g., `sudo apt install hadolint`)
-- [act](https://github.com/nektos/act): see [installation instructions](https://github.com/nektos/act#installation)
-
-### Run all checks locally
+Each role has a Molecule scenario under `ansible/roles/<role>/molecule/default`.
+Install the tooling with `pip install -r requirements-dev.txt` and run, for example:
 
 ```sh
-act -j ci
+cd ansible/roles/common
+molecule test
 ```
 
----
-**Plug & Play. Secure. Automated.**
-
----
-**Plug & Play. Secure. Automated.**
+There is no CI workflow in this repository.
